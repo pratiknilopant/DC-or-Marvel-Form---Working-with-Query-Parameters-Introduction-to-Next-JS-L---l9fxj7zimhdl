@@ -1,45 +1,58 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import FormA from './FormA';
-import FormB from './FormB';
-import Summary from './Summary';
+"use client";
+import React, { useEffect, useState } from "react";
+import FormA from "./FormA";
+import FormB from "./FormB";
+import Summary from "./Summary";
 
 const App = () => {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    age:'',
-    type:"",
-    DS:"",
-    MS:"",
-    step:'',
-  });
-  const [age, setAge] = useState('');
+  const [formData, setFormData] = useState({});
+  const [age, setAge] = useState(null);
 
-  useEffect(()=>{
-    setFormData(oldData=>{
-      return {
-        ...oldData,
-        age:age,
-        step:step,
-      }
-    })
-    console.log(step);
-  },[age,step])
+  function handMovieChange(movieName) {
+    setFormData((oldData) => {
+      const newData = { ...oldData };
+      newData.movieName = movieName;
+      return newData;
+    });
+    setStep(4);
+  }
 
   return (
     <div>
-      {(step === 1) && (
-        <div id='start-page'>
+      {(step === 1 || !age) && (
+        <div id="start-page">
           <h1>Step 1: Select Form Type and Enter Age</h1>
-          <label htmlFor="age">
-            Enter your age:</label>
-            <input id="age" type="number" onChange={(e)=>{
-              setAge(parseInt(e.target.value));
-            }} value={age} />
+          <label>
+            Enter your age:
+            <input
+              value={age}
+              type="number"
+              onChange={(e) => {
+                const ageInput = parseInt(e.target.value);
+                if (isNaN(ageInput)) {
+                  return;
+                }
+                setAge(ageInput);
+                setFormData({ age: ageInput });
+              }}
+            />
+          </label>
           <br />
-          <label> 
+          <label>
             Select Form Type:
-            <select onChange={(e) => setStep(parseInt(e.target.value))}>
+            <select
+              onChange={(e) => {
+                const formValue = parseInt(e.target.value);
+                setStep(formValue);
+                setFormData((old) => {
+                  const newForm = { ...old };
+                  // make this better this is better
+                  newForm.fromType = formValue === 2 ? "Form A" : "Form B";
+                  return newForm;
+                });
+              }}
+            >
               <option value={1}>--Select--</option>
               <option value={2}>Form A</option>
               <option value={3}>Form B</option>
@@ -48,26 +61,35 @@ const App = () => {
           <br />
         </div>
       )}
-      {(step === 2 && age) ?(
+      {step === 2 && age && (
         <div>
-        <FormA onSubmit={setFormData} setStep={setStep} age={age} />
-      </div>        
-      ):null}
-      {(step === 3 && age)? (
-        <div>
-          <FormB onSubmit={setFormData} setStep={setStep} age={age} />
+          <FormA age={age} onMovieChange={handMovieChange} />
         </div>
-      ):null}
+      )}
+      {step === 3 && age && (
+        <div>
+          <FormB age={age} onMovieChange={handMovieChange} />
+        </div>
+      )}
       {(step === 2 || step === 3) && age ? (
-        <button id='go-back' onClick={() => {setStep(1);setAge('')}}>
+        <button id="go-back" onClick={() => setStep(1)}>
           Go Back
         </button>
       ) : null}
 
       {step === 4 && (
         <div>
-          <Summary formData={formData}/>
-          <button onClick={() =>{ setStep(1); setAge('')}} id='start-over'>Start Over</button>
+          <Summary formData={formData} />
+          <button
+            id="start-over"
+            onClick={() => {
+              setFormData({});
+              setStep(1);
+              setAge(null);
+            }}
+          >
+            Start Over
+          </button>
         </div>
       )}
     </div>

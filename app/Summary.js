@@ -1,15 +1,18 @@
-'use client'
+"use client";
 import { useState } from "react";
 function Summary({ formData }) {
-    return (
-        <div id='summary'>
+  return (
+    <div id="summary">
       <h2>Summary</h2>
-      <p>Form Type: {formData.type}</p>
+      <p>Form Type: {formData.fromType}</p>
       <p>Age: {formData.age}</p>
-      {
-        formData.DS?<p>DC Shows: {formData.DS}</p>:<p>Marvel Shows: {formData.MS}</p> 
-      }     
+
+      {formData.fromType === "Form A" && <p>DC Shows: {formData.movieName}</p>}
+
+      {formData.fromType === "Form B" && (
+        <p>Marvel Shows: {formData.movieName}</p>
+      )}
     </div>
-    );
+  );
 }
 export default Summary;
